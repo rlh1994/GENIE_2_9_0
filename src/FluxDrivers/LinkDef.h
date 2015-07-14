@@ -19,6 +19,7 @@
 
 #pragma link C++ class genie::flux::GAtmoFlux;
 #pragma link C++ class genie::flux::GFlukaAtmo3DFlux;
+#pragma link C++ class genie::flux::GATMNCAtmo3DFlux;
 #pragma link C++ class genie::flux::GBartolAtmoFlux;
 
 #pragma link C++ class genie::flux::GAstroFlux;

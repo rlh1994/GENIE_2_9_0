@@ -71,8 +71,8 @@ public :
 
 private:
 
-  void SetBinSizes     (void);
-  bool FillFluxHisto2D (TH2D * h2, string filename);
+  void SetBinSizes   (void);
+  bool FillFluxHisto (TH3D * hist, string filename);
 };
 
 } // flux namespace

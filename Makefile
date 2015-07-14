@@ -32,16 +32,9 @@ BUILD_TARGETS =    print-make-info \
 		   nucleon-decay \
 		   reweight \
 		   mueloss \
-		   vld-tools \
+		   masterclass \
 		   doxygen-doc \
-		   generator-test-exe \
-		   generator-std-exe \
-		   t2k-support-softw \
-		   fnal-support-softw \
-		   atmo-support-softw \
-		   nucleon-decay-support-softw \
-		   reweight-support-softw \
-		   masterclass-support-softw \
+		   apps \
 		   install-scripts
 INSTALL_TARGETS =  print-makeinstall-info \
 		   check-previous-installation \
@@ -127,6 +120,8 @@ core-medium-energy-range: FORCE
 	@echo " "
 	@echo "** Building core medium energy range physics models..."
 	cd ${GENIE}/src;\
+	cd AlvarezRuso;        make; cd ..; \
+	cd BergerSehgal;       make; cd ..; \
 	cd BodekYang;          make; cd ..; \
 	cd Charm;              make; cd ..; \
 	cd Coherent;           make; cd ..; \
@@ -196,7 +191,7 @@ endif
 mueloss: FORCE
 ifeq ($(strip $(GOPT_ENABLE_MUELOSS)),YES)
 	@echo " "
-	@echo "** Building mueloss utility package..."
+	@echo "** Building MuELoss utility package..."
 	cd ${GENIE}/src/MuELoss; \
 	make; \
 	cd ${GENIE}
@@ -205,30 +200,16 @@ else
 	@echo "** Mueloss was not enabled. Skipping..."
 endif
 
-vld-tools: FORCE
-ifeq ($(strip $(GOPT_ENABLE_VALIDATION_TOOLS)),YES)
+masterclass: FORCE
+ifeq ($(strip $(GOPT_ENABLE_MASTERCLASS)),YES)
 	@echo " "
-	@echo "** Building GENIE validation tools..."
-	cd ${GENIE}/src/validation/EvScan; \
-	make; \
-	cd ${GENIE}/src/validation/MCx; \
-	make; \
-	cd ${GENIE}/src/validation/NuXSec; \
-	make; \
-	cd ${GENIE}/src/validation/StructFunc; \
-	make; \
-	cd ${GENIE}/src/validation/Hadronization; \
-	make; \
-	cd ${GENIE}/src/validation/Intranuke; \
-	make; \
-	cd ${GENIE}/src/validation/Merenyi; \
-	make; \
-	cd ${GENIE}/src/validation/eA; \
+	@echo "** Building Masterclass package..."
+	cd ${GENIE}/src/Masterclass; \
 	make; \
 	cd ${GENIE}
 else
 	@echo " "
-	@echo "** GENIE validation tools were disabled. Skipping..."
+	@echo "** Masterclass was not enabled. Skipping..."
 endif
 
 # This target is used for generating the doxygen documentation
@@ -253,93 +234,12 @@ doxygen: FORCE
 	make doxygen; \
 	cd ${GENIE}
 
-generator-std-exe: FORCE
+apps: FORCE
 	@echo " "
 	@echo "** Building GENIE applications..."
-	cd ${GENIE}/src/stdapp;\
+	cd ${GENIE}/src/Apps;\
 	make all; \
 	cd ${GENIE}
-
-generator-test-exe: FORCE
-ifeq ($(strip $(GOPT_ENABLE_TEST)),YES)
-	@echo " "
-	@echo "** Building test applications..."
-	cd ${GENIE}/src/test;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo " "
-	@echo "** Test applications were not enabled! Skipping..."
-endif
-
-t2k-support-softw: FORCE
-	@echo " "
-	@echo "** Building T2K-specific support software..."
-ifeq ($(strip $(GOPT_ENABLE_T2K)),YES)
-	cd ${GENIE}/src/support/t2k/EvGen/;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Not enabled! Skipping..."
-endif
-
-fnal-support-softw: FORCE
-	@echo " "
-	@echo "** Building FNAL-specific support software..."
-ifeq ($(strip $(GOPT_ENABLE_FNAL)),YES)
-	cd ${GENIE}/src/support/fnal/EvGen/;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Not enabled! Skipping..."
-endif
-
-
-atmo-support-softw: FORCE
-	@echo " "
-	@echo "** Building support software for atmospheric neutrino studies..."
-ifeq ($(strip $(GOPT_ENABLE_ATMO)),YES)
-	cd ${GENIE}/src/support/atmo/EvGen/;\
-	make all; \
-	cd ${GENIE}/src/support/atmo/UpMuFluxGen/;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Not enabled! Skipping..."
-endif
-
-nucleon-decay-support-softw: FORCE
-	@echo " "
-	@echo "** Building nucleon decay applications ..."
-ifeq ($(strip $(GOPT_ENABLE_NUCLEON_DECAY)),YES)
-	cd ${GENIE}/src/support/ndcy/EvGen;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Nucleon decay not enabled! Skipping..."
-endif
-
-reweight-support-softw: FORCE
-	@echo " "
-	@echo "** Building event reweighting applications ..."
-ifeq ($(strip $(GOPT_ENABLE_RWGHT)),YES)
-	cd ${GENIE}/src/support/rwght/;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Event reweighting not enabled! Skipping..."
-endif
-
-masterclass-support-softw: FORCE
-	@echo " "
-	@echo "** Building neutrino masterclass application ..."
-ifeq ($(strip $(GOPT_ENABLE_MASTERCLASS)),YES)
-	cd ${GENIE}/src/support/masterclass/;\
-	make all; \
-	cd ${GENIE}
-else
-	@echo "Masterclass app not enabled! Skipping..."
-endif
 
 install-scripts: FORCE
 	@echo " "
@@ -391,8 +291,10 @@ make-install-dirs: FORCE
 	[ -d ${GENIE_INCBASE_INSTALLATION_PATH} ] || mkdir ${GENIE_INCBASE_INSTALLATION_PATH}
 	mkdir ${GENIE_INC_INSTALLATION_PATH}
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/Algorithm
+	mkdir ${GENIE_INC_INSTALLATION_PATH}/AlvarezRuso
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/BaryonResonance
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/Base
+	mkdir ${GENIE_INC_INSTALLATION_PATH}/BergerSehgal
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/BodekYang
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/Charm
 	mkdir ${GENIE_INC_INSTALLATION_PATH}/Coherent
@@ -442,8 +344,10 @@ copy-install-files: FORCE
 	cp ${GENIE_BIN_PATH}/* ${GENIE_BIN_INSTALLATION_PATH};\
 	cd ${GENIE}/src;\
 	cd Algorithm;              make install; cd ..; \
+	cd AlvarezRuso;            make install; cd ..; \
 	cd BaryonResonance;        make install; cd ..; \
 	cd Base;                   make install; cd ..; \
+	cd BergerSehgal;           make install; cd ..; \
 	cd BodekYang;              make install; cd ..; \
 	cd Charm;                  make install; cd ..; \
 	cd Coherent;               make install; cd ..; \
@@ -493,8 +397,10 @@ purge: FORCE
 	@echo "** Purging..."
 	cd ${GENIE}/src;\
 	cd Algorithm;                     make purge; cd ..; \
+	cd AlvarezRuso;                   make purge; cd ..; \
 	cd BaryonResonance;               make purge; cd ..; \
 	cd Base;                          make purge; cd ..; \
+	cd BergerSehgal;                  make purge; cd ..; \
 	cd BodekYang;                     make purge; cd ..; \
 	cd Charm;                         make purge; cd ..; \
 	cd Coherent;                      make purge; cd ..; \
@@ -536,13 +442,6 @@ purge: FORCE
 	cd Utils;                         make purge; cd ..; \
 	cd VLE;                           make purge; cd ..; \
 	cd VHE;                           make purge; cd ..; \
-	cd validation/EvScan;             make purge; cd ../../; \
-	cd validation/MCx;                make purge; cd ../../; \
-	cd validation/NuXSec;             make purge; cd ../../; \
-	cd validation/StructFunc;         make purge; cd ../../; \
-	cd validation/Hadronization;      make purge; cd ../../; \
-	cd validation/Merenyi;            make purge; cd ../../; \
-	cd validation/eA;                 make purge; cd ../../; \
 	cd ${GENIE}
 
 clean: clean-files clean-dir clean-etc
@@ -552,8 +451,10 @@ clean-files: FORCE
 	@echo "** Cleaning..."
 	cd ${GENIE}/src;\
 	cd Algorithm;                     make clean; cd ..; \
+	cd AlvarezRuso;                   make clean; cd ..; \
 	cd BaryonResonance;               make clean; cd ..; \
 	cd Base;                          make clean; cd ..; \
+	cd BergerSehgal;                  make clean; cd ..; \
 	cd BodekYang;                     make clean; cd ..; \
 	cd Charm;                         make clean; cd ..; \
 	cd Coherent;                      make clean; cd ..; \
@@ -593,23 +494,9 @@ clean-files: FORCE
 	cd ReWeight;                      make clean; cd ..; \
 	cd SingleKaon;                    make clean; cd ..; \
 	cd Utils;                         make clean; cd ..; \
-	cd validation/EvScan;             make clean; cd ../../; \
-	cd validation/MCx;                make clean; cd ../../; \
-	cd validation/NuXSec;             make clean; cd ../../; \
-	cd validation/StructFunc;         make clean; cd ../../; \
-	cd validation/Hadronization;      make clean; cd ../../; \
-	cd validation/Merenyi;            make clean; cd ../../; \
-	cd validation/eA;                 make clean; cd ../../; \
 	cd VLE;                           make clean; cd ..; \
 	cd VHE;                           make clean; cd ..; \
-	cd stdapp;                        make clean; cd ..; \
-	cd support/t2k/EvGen/;            make clean; cd ../../../; \
-	cd support/fnal/EvGen/;           make clean; cd ../../../; \
-	cd support/atmo/EvGen/;           make clean; cd ../../../; \
-	cd support/atmo/UpMuFluxGen/;     make clean; cd ../../../; \
-	cd support/ndcy/EvGen/;           make clean; cd ../../../; \
-	cd support/rwght/;                make clean; cd ../../; \
-	cd support/masterclass/;          make clean; cd ../../; \
+	cd Apps;                          make clean; cd ..; \
 	cd test;                          make clean; cd ..; \
 	cd scripts;                       make clean; cd ..;\
 	cd $(GENIE);\
@@ -633,8 +520,10 @@ distclean: FORCE
 	[ ! -d ${GENIE_INSTALLATION_PATH}/include/GENIE ] || rm -rf ${GENIE_INSTALLATION_PATH}/include/GENIE/
 	cd ${GENIE}/src/;\
 	cd Algorithm;                      make distclean; cd ..; \
+	cd AlvarezRuso;                    make distclean; cd ..; \
 	cd BaryonResonance;                make distclean; cd ..; \
 	cd Base;                           make distclean; cd ..; \
+	cd BergerSehgal;                   make distclean; cd ..; \
 	cd BodekYang;                      make distclean; cd ..; \
 	cd Charm;                          make distclean; cd ..; \
 	cd Coherent;                       make distclean; cd ..; \
@@ -674,23 +563,9 @@ distclean: FORCE
 	cd ReWeight;                       make distclean; cd ..; \
 	cd SingleKaon;                     make distclean; cd ..; \
 	cd Utils;                          make distclean; cd ..; \
-	cd validation/EvScan;              make distclean; cd ../../; \
-	cd validation/MCx;                 make distclean; cd ../../; \
-	cd validation/NuXSec;              make distclean; cd ../../; \
-	cd validation/StructFunc;          make distclean; cd ../../; \
-	cd validation/Hadronization;       make distclean; cd ../../; \
-	cd validation/Merenyi;             make distclean; cd ../../; \
-	cd validation/eA;                  make distclean; cd ../../; \
 	cd VLE;                            make distclean; cd ..; \
 	cd VHE;                            make distclean; cd ..; \
-	cd stdapp;                         make distclean; cd ..; \
-	cd support/t2k/EvGen/;             make distclean; cd ../../../; \
-	cd support/fnal/EvGen/;            make distclean; cd ../../../; \
-	cd support/atmo/EvGen/;            make distclean; cd ../../../; \
-	cd support/atmo/UpMuFluxGen/;      make distclean; cd ../../../; \
-	cd support/ndcy/EvGen/;            make distclean; cd ../../../; \
-	cd support/rwght/;                 make distclean; cd ../../; \
-	cd support/masterclass/;           make distclean; cd ../../; \
+	cd Apps;                           make distclean; cd ..; \
 	cd test;                           make distclean; cd ..; \
 	cd scripts;                        make distclean; \
 	cd ${GENIE}

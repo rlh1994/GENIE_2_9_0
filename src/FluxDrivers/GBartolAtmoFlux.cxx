@@ -21,11 +21,12 @@
 #include <fstream>
 #include <cassert>
 
-#include <TH2D.h>
+#include <TH3D.h>
 #include <TMath.h>
 
 #include "FluxDrivers/GBartolAtmoFlux.h"
 #include "Messenger/Messenger.h"
+#include "Conventions/Constants.h"
 
 #include "FluxDrivers/GFluxDriverFactory.h"
 FLUXDRIVERREG4(genie,flux,GBartolAtmoFlux,genie::flux::GBartolAtmoFlux)
@@ -35,6 +36,7 @@ using std::ios;
 
 using namespace genie;
 using namespace genie::flux;
+using namespace genie::constants;
 
 //____________________________________________________________________________
 GBartolAtmoFlux::GBartolAtmoFlux() :
@@ -68,8 +70,12 @@ void GBartolAtmoFlux::SetBinSizes(void)
 //      given in 30 log-spaced bins from 10 to 1000 GeV
 //      (10 bins per decade)
      
+  fPhiBins       = new double [2];
   fCosThetaBins  = new double [kBGLRS3DNumCosThetaBins + 1];
   fEnergyBins    = new double [kBGLRS3DNumLogEvBinsLow + kBGLRS3DNumLogEvBinsHigh + 1];
+
+  fPhiBins[0] = 0;
+  fPhiBins[1] = 2.*kPi;
    
   double dcostheta =
       (kBGLRS3DCosThetaMax - kBGLRS3DCosThetaMin) / 
@@ -114,11 +120,12 @@ void GBartolAtmoFlux::SetBinSizes(void)
     } 
   }      
 
+  fNumPhiBins      = 1;
   fNumCosThetaBins = kBGLRS3DNumCosThetaBins;
   fNumEnergyBins   = kBGLRS3DNumLogEvBinsLow + kBGLRS3DNumLogEvBinsHigh; 
 }
 //___________________________________________________________________________
-bool GBartolAtmoFlux::FillFluxHisto2D(TH2D * histo, string filename)
+bool GBartolAtmoFlux::FillFluxHisto(TH3D * histo, string filename)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 
@@ -151,7 +158,7 @@ bool GBartolAtmoFlux::FillFluxHisto2D(TH2D * histo, string filename)
       LOG("Flux", pINFO)
         << "Flux[Ev = " << energy 
         << ", cos8 = " << costheta << "] = " << flux;
-      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)costheta );
+      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)costheta, (Axis_t)kPi );
       histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
     }
   }

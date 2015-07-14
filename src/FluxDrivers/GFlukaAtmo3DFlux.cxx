@@ -26,11 +26,12 @@
 #include <cassert>
 #include <fstream>
 
-#include <TH2D.h>
+#include <TH3D.h>
 #include <TMath.h>
 
 #include "FluxDrivers/GFlukaAtmo3DFlux.h"
 #include "Messenger/Messenger.h"
+#include "Conventions/Constants.h"
 
 #include "FluxDrivers/GFluxDriverFactory.h"
 FLUXDRIVERREG4(genie,flux,GFlukaAtmo3DFlux,genie::flux::GFlukaAtmo3DFlux)
@@ -39,6 +40,7 @@ using std::ifstream;
 using std::ios;
 using namespace genie;
 using namespace genie::flux;
+using namespace genie::constants;
 
 //____________________________________________________________________________
 GFlukaAtmo3DFlux::GFlukaAtmo3DFlux() :
@@ -64,8 +66,12 @@ void GFlukaAtmo3DFlux::SetBinSizes(void)
 // per decade), with Emin = 0.100 GeV.
 //
 
+  fPhiBins       = new double [2];
   fCosThetaBins  = new double [kGFlk3DNumCosThetaBins  + 1];
   fEnergyBins    = new double [kGFlk3DNumLogEvBins     + 1];
+
+  fPhiBins[0] = 0;
+  fPhiBins[1] = 2.*kPi;
 
   double dcostheta = 
       (kGFlk3DCosThetaMax - kGFlk3DCosThetaMin) /
@@ -109,11 +115,12 @@ void GFlukaAtmo3DFlux::SetBinSizes(void)
          << ": bin centre = " << (fEnergyBins[i] + fEnergyBins[i+1])/2.;
   }
 
+  fNumPhiBins      = 1;
   fNumCosThetaBins = kGFlk3DNumCosThetaBins;
   fNumEnergyBins   = kGFlk3DNumLogEvBins;
 }
 //____________________________________________________________________________
-bool GFlukaAtmo3DFlux::FillFluxHisto2D(TH2D * histo, string filename)
+bool GFlukaAtmo3DFlux::FillFluxHisto(TH3D * histo, string filename)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 
@@ -141,7 +148,8 @@ bool GFlukaAtmo3DFlux::FillFluxHisto2D(TH2D * histo, string filename)
         << "Flux[Ev = " << energy 
         << ", cos8 = " << costheta << "] = " << flux;
       // note: reversing the Fluka sign convention for zenith angle
-      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta) );   
+      //       1 phi bin
+      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)kPi );   
       histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
     }
   }
