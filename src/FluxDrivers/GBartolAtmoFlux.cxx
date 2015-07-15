@@ -125,7 +125,7 @@ void GBartolAtmoFlux::SetBinSizes(void)
   fNumEnergyBins   = kBGLRS3DNumLogEvBinsLow + kBGLRS3DNumLogEvBinsHigh; 
 }
 //___________________________________________________________________________
-bool GBartolAtmoFlux::FillFluxHisto(TH3D * histo, string filename)
+bool GBartolAtmoFlux::FillFluxHisto(TH3D * histo, string filename, const int& pdg_nu)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 

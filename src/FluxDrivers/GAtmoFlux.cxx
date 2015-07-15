@@ -115,8 +115,8 @@ bool GAtmoFlux::GenerateNext_1try(void)
   // Generate (Ev, costheta, phi) 
   double Ev       = 0.;
   double costheta = 0.;
-  double phi      = 0;
-  double weight   = 0;
+  double phi      = 0.;
+  double weight   = 0.;
   int    nu_pdg   = 0;
 
   if(fGenWeighted) {
@@ -399,6 +399,7 @@ void GAtmoFlux::CleanUp(void)
 
   delete [] fCosThetaBins;
   delete [] fEnergyBins;
+  delete [] fPhiBins;
 }
 //___________________________________________________________________________
 void GAtmoFlux::SetRadii(double Rlongitudinal, double Rtransverse)
@@ -456,7 +457,7 @@ bool GAtmoFlux::LoadFluxData(void)
       fRawFluxHistoMap.insert( map<int,TH3D*>::value_type(nu_pdg,hist) );
     }
 
-    bool loaded = this->FillFluxHisto(hist, filename);
+    bool loaded = this->FillFluxHisto(hist, filename, nu_pdg);
 
     loading_status = loading_status && loaded;
   }

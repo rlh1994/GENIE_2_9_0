@@ -17,6 +17,7 @@
 
 #include <cassert>
 #include <fstream>
+#include <string>
 
 #include <TH3D.h>
 #include <TMath.h>
@@ -142,18 +143,143 @@ bool GATMNCAtmo3DFlux::FillFluxHisto(TH3D * histo, string filename)
      return false;
   }
 
-  double energy, costheta, phi, flux;
-  char   j1, j2, j3;
+  int    ibin, section, subsection, line;
+  double energy, costheta, flux, phi;
+  std::string junk;
+  section = subsection = line = 1; //initialising some values
+  costheta= 0.95;
+  phi = 2.0*TMath::Pi()*(15.0/360.0); 
 
-  const int kNLines = kGHnd3DNumCosThetaBins * kGHnd3DNumPhiBins * kGHnd3DNumLogEvBins;
-  int iline = 0;
-  while (++iline<=kNLines) {
-    flux_stream >> energy >> j1 >> costheta >> j2 >> phi >> j3 >> flux;
-    LOG("Flux", pINFO)
-      << "Flux[Ev = " << energy 
-      << ", cos8 = " << costheta 
-      << ", phi = " << phi << "] = " << flux;
-    histo->Fill( (Axis_t)energy, (Axis_t)costheta, (Axis_t)phi, (Axis_t)flux );
+  double scale = 1.0; // 1.0 [m^2], OR 1.0e-4 [cm^2]
+
+  if(pdg_nu == 14){
+    while ( flux_stream ) {
+      flux = 0.0;
+      if (line == 1 || line == 2){
+        std::getline(flux_stream, junk);
+        line++; //ignore these lines
+      } else {
+        flux_stream >> energy >> flux >> junk >> junk >> junk;
+        line++;
+        costheta = 1.0 -((double)section*0.1) + 0.05; //costheta is known based on what
+                                                     //section of data we are in, this gives middle value
+        phi = 2.0*TMath::Pi()*((-15.0 + ((double)subsection * 30.0))/360.0); //phi known by subsection, again gives middle value
+        if( line == 104 ){ //new phi range
+          ++subsection;
+          line = 1;
+          getline(flux_stream, junk);
+          if (subsection == 13) //new costheta range
+          {
+            ++section;
+            subsection = 1;
+          }
+        }
+      }
+      if( flux>0.0 ){
+        LOG("Flux", pINFO)
+          << "Flux[Ev = " << energy 
+          << ", cos8 = " << costheta
+          << ", phi = " << phi << "] = " << flux;
+        ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)phi );   
+        histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
+      }
+    }
+  } else if(pdg_nu == -14){
+    while ( flux_stream ) {
+      flux = 0.0;
+      if (line == 1 || line == 2){
+        std::getline(flux_stream, junk);
+        line++; //ignore these lines
+      } else {
+        flux_stream >> energy >> junk >> flux >> junk >> junk; 
+        line++;
+        costheta = 1.0 -((double)section*0.1) + 0.05; 
+        phi = 2*TMath::Pi()*((-15.0 + ((double)subsection * 30.0))/360.0);
+        if( line == 104 ){ //new phi range
+          ++subsection;
+          line = 1;
+          getline(flux_stream, junk);
+          if (subsection == 13) //new costheta range
+          {
+            ++section;
+            subsection = 1;
+          }
+        }
+      }
+      if( flux>0.0 ){
+        LOG("Flux", pINFO)
+          << "Flux[Ev = " << energy 
+          << ", cos8 = " << costheta
+          << ", phi = " << phi << "] = " << flux;
+        ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)phi );   
+        histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
+      }
+    }
+  } else if(pdg_nu == 12){
+    while ( flux_stream ) {
+      flux = 0.0;
+      if (line == 1 || line == 2){
+        std::getline(flux_stream, junk);
+        line++; //ignore these lines
+      } else {
+        flux_stream >> energy >> junk >> junk >> flux >> junk; 
+        line++;
+        costheta = 1.0 -((double)section*0.1) + 0.05;
+        phi = 2*TMath::Pi()*((-15.0 + ((double)subsection * 30.0))/360.0);
+        if( line == 104 ){ //new phi range
+          ++subsection;
+          line = 1;
+          getline(flux_stream, junk);
+          if (subsection == 13) //new costheta range
+          {
+            ++section;
+            subsection = 1;
+          }
+        }
+      }
+      if( flux>0.0 ){
+        LOG("Flux", pINFO)
+          << "Flux[Ev = " << energy 
+          << ", cos8 = " << costheta
+          << ", phi = " << phi << "] = " << flux;
+        ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)phi );   
+        histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
+      }
+    }
+  } else if (pdg_nu == -12){
+    while ( flux_stream ) {
+      flux = 0.0;
+      if (line == 1 || line == 2){
+        std::getline(flux_stream, junk);
+        line++; //ignore these lines
+      } else {
+        flux_stream >> energy >> junk >> junk >> junk >> flux;
+        line++;
+        costheta = 1.0 -((double)section*0.1) + 0.05; //costheta is known based on what
+                                                     //section of data we are in, this gives middle value
+        phi = 2*TMath::Pi()*((-15.0 + ((double)subsection * 30.0))/360.0);  //phi known by subsection, again gives middle value
+        if( line == 104 ){ //new phi range
+          ++subsection;
+          line = 1;
+          getline(flux_stream, junk);
+          if (subsection == 13){ //new costheta range
+            ++section;
+            subsection = 1;
+          }
+        }
+      }
+      if( flux>0.0 ){
+        LOG("Flux", pINFO)
+          << "Flux[Ev = " << energy 
+          << ", cos8 = " << costheta
+          << ", phi = " << phi << "] = " << flux;
+        ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)phi );   
+        histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
+      }
+    }
+  } else {
+    LOG("FLUX", pERROR) 
+      << "PDG code is not a neutrino type supported by this file.";
   }
   return true;
 }

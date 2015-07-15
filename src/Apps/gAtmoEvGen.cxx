@@ -243,6 +243,7 @@
 #ifdef __GENIE_FLUX_DRIVERS_ENABLED__
 #include "FluxDrivers/GFlukaAtmo3DFlux.h"
 #include "FluxDrivers/GBartolAtmoFlux.h"
+#include "FluxDrivers/GATMNCAtmo3DFlux.h"
 #endif
 
 #ifdef __GENIE_GEOM_DRIVERS_ENABLED__
@@ -442,6 +443,10 @@ GFluxI* GetFlux(void)
   if(gOptFluxSim == "BGLRS") {
      GBartolAtmoFlux * bartol_flux = new GBartolAtmoFlux;
      atmo_flux_driver = dynamic_cast<GAtmoFlux *>(bartol_flux);
+  } else
+  if(gOptFluxSim == "ATMNC") {
+     GATMNCAtmo3DFlux * atmnc_flux = new GATMNCAtmo3DFlux;
+     atmo_flux_driver = dynamic_cast<GAtmoFlux *>(atmnc_flux);
   } else {
      LOG("gevgen_atmo", pFATAL) << "Uknonwn flux simulation: " << gOptFluxSim;
      gAbortingInErr = true;
@@ -608,9 +613,9 @@ void GetCommandLineArgs(int argc, char ** argv)
     for(string::size_type i=0; i<gOptFluxSim.size(); i++) {
        gOptFluxSim[i] = toupper(gOptFluxSim[i]);
     }
-    if((gOptFluxSim != "FLUKA") && (gOptFluxSim != "BGLRS")) {
+    if((gOptFluxSim != "FLUKA") && (gOptFluxSim != "BGLRS") && (gOptFluxSim != "ATMNC")) {
         LOG("gevgen_atmo", pFATAL) 
-             << "The flux file source needs to be one of <FLUKA,BGLRS>"; 
+             << "The flux file source needs to be one of <FLUKA,BGLRS,ATMNC>"; 
         PrintSyntax();
         gAbortingInErr = true;
         exit(1);

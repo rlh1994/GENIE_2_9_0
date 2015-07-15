@@ -117,7 +117,7 @@ protected:
   TH3D*   CreateNormalisedFluxHisto ( TH3D* hist);  // normalise flux files
 
   // pure virtual protected methods; to be implemented by concrete flux drivers
-  virtual bool FillFluxHisto (TH3D * hist, string filename) = 0;
+  virtual bool FillFluxHisto (TH3D * hist, string filename, const int& pdg_nu) = 0;
 
   // protected data members
   double           fMaxEv;              ///< maximum energy (in input flux files)
