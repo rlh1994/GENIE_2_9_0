@@ -1,6 +1,6 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2013, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
@@ -21,14 +21,11 @@
 #include <fstream>
 #include <cassert>
 
-#include <TH2D.h>
+#include <TH3D.h>
 #include <TMath.h>
 
 #include "FluxDrivers/GBartolAtmoFlux.h"
 #include "Messenger/Messenger.h"
-
-#include "FluxDrivers/GFluxDriverFactory.h"
-FLUXDRIVERREG4(genie,flux,GBartolAtmoFlux,genie::flux::GBartolAtmoFlux)
 
 using std::ifstream;
 using std::ios;
@@ -54,10 +51,11 @@ GBartolAtmoFlux::~GBartolAtmoFlux()
 //___________________________________________________________________________
 void GBartolAtmoFlux::SetBinSizes(void)
 {
-// Generate the correct cos(theta) and energy bin sizes.
+// Generate the correct cos(theta), phi and energy bin sizes.
 //
 // Zenith angle binning: the flux is given in 20 bins of 
 // cos(zenith angle) from -1.0 to 1.0 (bin width = 0.1) 
+
 //
 // Neutrino energy binning: the Bartol flux files are 
 // provided in two pieces 
@@ -70,6 +68,10 @@ void GBartolAtmoFlux::SetBinSizes(void)
      
   fCosThetaBins  = new double [kBGLRS3DNumCosThetaBins + 1];
   fEnergyBins    = new double [kBGLRS3DNumLogEvBinsLow + kBGLRS3DNumLogEvBinsHigh + 1];
+  fPhiBins       = new double [2];
+
+  fPhiBins[0] = 0;
+  fPhiBins[1] = 2.*TMath::Pi();
    
   double dcostheta =
       (kBGLRS3DCosThetaMax - kBGLRS3DCosThetaMin) / 
@@ -95,7 +97,7 @@ void GBartolAtmoFlux::SetBinSizes(void)
         << ": upper edge = " << fCosThetaBins[kBGLRS3DNumCosThetaBins];
     }
   }
-     
+
   double logE = logEmin;
  
   for(unsigned int i=0; i<=kBGLRS3DNumLogEvBinsLow+kBGLRS3DNumLogEvBinsHigh; i++) {
@@ -116,9 +118,10 @@ void GBartolAtmoFlux::SetBinSizes(void)
 
   fNumCosThetaBins = kBGLRS3DNumCosThetaBins;
   fNumEnergyBins   = kBGLRS3DNumLogEvBinsLow + kBGLRS3DNumLogEvBinsHigh; 
+  fNumPhiBins      = 1;
 }
 //___________________________________________________________________________
-bool GBartolAtmoFlux::FillFluxHisto2D(TH2D * histo, string filename)
+bool GBartolAtmoFlux::FillFluxHisto3D(TH3D * histo, string filename, const int& pdg_nu)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 
@@ -150,8 +153,8 @@ bool GBartolAtmoFlux::FillFluxHisto2D(TH2D * histo, string filename)
       flux /= energy;
       LOG("Flux", pINFO)
         << "Flux[Ev = " << energy 
-        << ", cos8 = " << costheta << "] = " << flux;
-      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)costheta );
+        << ", cos8 = " << costheta << flux;
+      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)costheta, (Axis_t)TMath::Pi() );
       histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
     }
   }

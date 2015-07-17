@@ -1,11 +1,11 @@
 //____________________________________________________________________________
 /*
- Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+ Copyright (c) 2003-2013, GENIE Neutrino MC Generator Collaboration
  For the full text of the license visit http://copyright.genie-mc.org
  or see $GENIE/LICENSE
 
  Author: Costas Andreopoulos <costas.andreopoulos \at stfc.ac.uk>
-         University of Liverpool & STFC Rutherford Appleton Lab
+         STFC, Rutherford Appleton Laboratory
 
  For the class documentation see the corresponding header file.
 
@@ -26,14 +26,11 @@
 #include <cassert>
 #include <fstream>
 
-#include <TH2D.h>
+#include <TH3D.h>
 #include <TMath.h>
 
 #include "FluxDrivers/GFlukaAtmo3DFlux.h"
 #include "Messenger/Messenger.h"
-
-#include "FluxDrivers/GFluxDriverFactory.h"
-FLUXDRIVERREG4(genie,flux,GFlukaAtmo3DFlux,genie::flux::GFlukaAtmo3DFlux)
 
 using std::ifstream;
 using std::ios;
@@ -58,14 +55,19 @@ GFlukaAtmo3DFlux::~GFlukaAtmo3DFlux()
 //___________________________________________________________________________
 void GFlukaAtmo3DFlux::SetBinSizes(void)
 {
-// Generate the correct cos(theta) and energy bin sizes
+// Generate the correct cos(theta), energy and phi bin sizes
 // The flux is given in 40 bins of cos(zenith angle) from -1.0 to 1.0
-// (bin width = 0.05) and 61 equally log-spaced energy bins (20 bins 
+// (bin width = 0.05), 12 bins of phi angle from 0 to 2Pi (bin width = Pi/6) 
+//and 61 equally log-spaced energy bins (20 bins 
 // per decade), with Emin = 0.100 GeV.
 //
 
   fCosThetaBins  = new double [kGFlk3DNumCosThetaBins  + 1];
   fEnergyBins    = new double [kGFlk3DNumLogEvBins     + 1];
+  fPhiBins       = new double [2];
+
+  fPhiBins[0] = 0;
+  fPhiBins[1] = 2.*TMath::Pi();
 
   double dcostheta = 
       (kGFlk3DCosThetaMax - kGFlk3DCosThetaMin) /
@@ -90,6 +92,7 @@ void GFlukaAtmo3DFlux::SetBinSizes(void)
      }
   }
 
+
   for(unsigned int i=0; i<= kGFlk3DNumLogEvBins; i++) {
      fEnergyBins[i] = TMath::Power(10., logEmin + i*dlogE);
      if(i != kGFlk3DNumLogEvBins) {
@@ -111,9 +114,10 @@ void GFlukaAtmo3DFlux::SetBinSizes(void)
 
   fNumCosThetaBins = kGFlk3DNumCosThetaBins;
   fNumEnergyBins   = kGFlk3DNumLogEvBins;
+  fNumPhiBins      = 1;
 }
 //____________________________________________________________________________
-bool GFlukaAtmo3DFlux::FillFluxHisto2D(TH2D * histo, string filename)
+bool GFlukaAtmo3DFlux::FillFluxHisto3D(TH3D * histo, string filename, const int& pdg_nu)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 
@@ -136,12 +140,13 @@ bool GFlukaAtmo3DFlux::FillFluxHisto2D(TH2D * histo, string filename)
   while ( !flux_stream.eof() ) {
     flux = 0.0;
     flux_stream >> energy >> j1 >> costheta >> j2 >> flux;
+
     if( flux>0.0 ){
       LOG("Flux", pINFO)
         << "Flux[Ev = " << energy 
         << ", cos8 = " << costheta << "] = " << flux;
       // note: reversing the Fluka sign convention for zenith angle
-      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta) );   
+      ibin = histo->FindBin( (Axis_t)energy, (Axis_t)(-costheta), (Axis_t)TMath::Pi() );   
       histo->SetBinContent( ibin, (Stat_t)(scale*flux) );
     }
   }

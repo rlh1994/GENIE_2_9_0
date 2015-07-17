@@ -28,11 +28,11 @@
           flux neutrinos (the latter giving smoother distributions at the tails).
 
 \author   Costas Andreopoulos <costas.andreopoulos \at stfc.ac.uk>
-          University of Liverpool & STFC Rutherford Appleton Lab
+          STFC, Rutherford Appleton Laboratory
 
 \created  January 26, 2008
 
-\cpright  Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2013, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -50,7 +50,7 @@
 
 #include "EVGDrivers/GFluxI.h"
 
-class TH2D;
+class TH3D;
 
 using std::string;
 using std::map;
@@ -94,10 +94,11 @@ public :
   void     AddFluxFile        (int neutrino_pdg, string filename);
   bool     LoadFluxData       (void);
 
-  TH2D*    GetFluxHistogram   (int flavour);
+  TH3D*    GetFluxHistogram   (int flavour);
   double   GetFlux            (int flavour);
   double   GetFlux            (int flavour, double energy);
   double   GetFlux            (int flavour, double energy, double angle);
+  double   GetFlux            (int flavour, double energy, double angle, double phi);
 
 protected:
 
@@ -110,16 +111,16 @@ protected:
   void    CleanUp           (void);
   void    ResetSelection    (void);
   double  MinEnergy         (void) { return fMinEvCut; }
-  TH2D *  CreateFluxHisto2D (string name, string title);
-  void    ZeroFluxHisto2D   (TH2D * h2);
+  TH3D *  CreateFluxHisto3D (string name, string title);
+  void    ZeroFluxHisto3D   (TH3D * h3);
   void    AddAllFluxes      (void);
-  int     SelectNeutrino    (double Ev, double costheta);
+  int     SelectNeutrino    (double Ev, double costheta, double phi);
   
   // normalise flux files
-  TH2D* CreateNormalisedFluxHisto2D( TH2D* h2 );
+  TH3D* CreateNormalisedFluxHisto3D( TH3D* h3 );
 
   // pure virtual protected methods; to be implemented by concrete flux drivers
-  virtual bool FillFluxHisto2D   (TH2D * h2, string filename) = 0;
+  virtual bool FillFluxHisto3D   (TH3D * h3, string filename, const int& pdg_nu) = 0;
 
   // protected data members
   double           fMaxEv;            ///< maximum energy (in input flux files)
@@ -136,17 +137,19 @@ protected:
   TRotation        fRotTHz2User;      ///< coord. system rotation: THZ -> Topocentric user-defined
   unsigned int     fNumCosThetaBins;  ///< number of cos(theta) bins in input flux data files
   unsigned int     fNumEnergyBins;    ///< number of energy bins in input flux data files
+  unsigned int     fNumPhiBins;       ///< number of phi bins in input data files
   double *         fCosThetaBins;     ///< cos(theta) bins in input flux data files
   double *         fEnergyBins;       ///< energy bins in input flux data files
+  double *         fPhiBins;          ///< phi bins in input flux data files
   bool             fGenWeighted;      ///< generate a weighted or unweighted flux?
   double           fSpectralIndex;    ///< power law function used for weighted flux
   bool             fInitialized;      ///< flag to check that initialization is run
 
-  TH2D *           fFluxSum2D;        ///< flux = f(Ev,cos8) summed over neutrino species
-  double           fFluxSum2DIntg;    ///< fFluxSum2D integral 
+  TH3D *           fFluxSum3D;        ///< flux = f(Ev,cos8, phi) summed over neutrino species
+  double           fFluxSum3DIntg;    ///< fFluxSum3D integral 
 
-  map<int, TH2D*>  fFlux2D;           ///< flux = f(Ev,cos8) for each neutrino species
-  map<int, TH2D*>  fFluxRaw2D;        ///< flux = f(Ev,cos8) for each neutrino species
+  map<int, TH3D*>  fFlux3D;           ///< flux = f(Ev,cos8, phi) for each neutrino species
+  map<int, TH3D*>  fFluxRaw3D;        ///< flux = f(Ev,cos8, phi) for each neutrino species
 
   vector<int>      fFluxFlavour;      ///< input flux file for each neutrino species
   vector<string>   fFluxFile;         ///< input flux file for each neutrino species

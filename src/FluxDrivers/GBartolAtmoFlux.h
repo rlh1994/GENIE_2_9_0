@@ -33,7 +33,7 @@
 
 \created January 26, 2008
 
-\cpright  Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+\cpright  Copyright (c) 2003-2013, GENIE Neutrino MC Generator Collaboration
           For the full text of the license visit http://copyright.genie-mc.org
           or see $GENIE/LICENSE
 */
@@ -72,7 +72,7 @@ public :
 private:
 
   void SetBinSizes     (void);
-  bool FillFluxHisto2D (TH2D * h2, string filename);
+  bool FillFluxHisto3D (TH3D * h3, string filename, const int& pdg_nu);
 };
 
 } // flux namespace

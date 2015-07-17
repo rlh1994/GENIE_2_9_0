@@ -35,8 +35,8 @@
 */
 //____________________________________________________________________________
 
-#ifndef _GFLUKA_ATMO_3D_FLUX_I_H_
-#define _GFLUKA_ATMO_3D_FLUX_I_H_
+#ifndef _GHONDA_ATMO_FLUX_I_H_
+#define _GHONDA_ATMO_FLUX_I_H_
 
 #include "FluxDrivers/GAtmoFlux.h"
 #include <TMath.h>
@@ -45,18 +45,21 @@ namespace genie {
 namespace flux  {
 
 // Number of cos(zenith) and energy bins in flux simulation
-const unsigned int kGFlk3DNumCosThetaBins       = 40;
-const double       kGFlk3DCosThetaMin           = -1.0;
-const double       kGFlk3DCosThetaMax           =  1.0;
-const unsigned int kGFlk3DNumLogEvBins          = 61;
-const unsigned int kGFlk3DNumLogEvBinsPerDecade = 20;
-const double       kGFlk3DEvMin                 = 0.100; // GeV
+const unsigned int kGHondaNumCosThetaBins       = 20; 
+const double       kGHondaCosThetaMin           = -1.0;
+const double       kGHondaCosThetaMax           =  1.0;
+const unsigned int kGHondaNumLogEvBins          = 101;
+const unsigned int kGHondaNumLogEvBinsPerDecade = 20;
+const double       kGHondaEvMin                 = 0.095; // GeV
+const unsigned int kGHondaNumPhiBins            = 12; 
+const double       kGHondaPhiMin                = 0.0;
+const double       kGHondaPhiMax                = 2.0*TMath::Pi();
 
-class GFlukaAtmo3DFlux: public GAtmoFlux {
+class GHondaAtmoFlux: public GAtmoFlux {
 
 public :
-  GFlukaAtmo3DFlux();
- ~GFlukaAtmo3DFlux();
+  GHondaAtmoFlux();
+ ~GHondaAtmoFlux();
 
   //
   // Most implementation is derived from the base GAtmoFlux

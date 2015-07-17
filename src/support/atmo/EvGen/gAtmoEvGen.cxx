@@ -193,7 +193,7 @@
 \created August 20, 2010
 
 \author  Costas Andreopoulos <costas.andreopoulos \at stfc.ac.uk>
-         University of Liverpool & STFC Rutherford Appleton Lab
+         STFC, Rutherford Appleton Laboratory
 
          Torben Ferber <torben.ferber \at DESY.DE>
          DESY
@@ -204,7 +204,7 @@
          Tarak Thakore <tarak \at mailhost.tifr.res.in>
          Tata Institute of Fundamental Research 
 
-\cpright Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
+\cpright Copyright (c) 2003-2013, GENIE Neutrino MC Generator Collaboration
          For the full text of the license visit http://copyright.genie-mc.org
          or see $GENIE/LICENSE
 */
@@ -243,6 +243,7 @@
 #ifdef __GENIE_FLUX_DRIVERS_ENABLED__
 #include "FluxDrivers/GFlukaAtmo3DFlux.h"
 #include "FluxDrivers/GBartolAtmoFlux.h"
+#include "FluxDrivers/GHondaAtmoFlux.h"
 #endif
 
 #ifdef __GENIE_GEOM_DRIVERS_ENABLED__
@@ -442,7 +443,11 @@ GFluxI* GetFlux(void)
   if(gOptFluxSim == "BGLRS") {
      GBartolAtmoFlux * bartol_flux = new GBartolAtmoFlux;
      atmo_flux_driver = dynamic_cast<GAtmoFlux *>(bartol_flux);
-  } else {
+  } else
+  if(gOptFluxSim == "HONDA"){
+    GHondaAtmoFlux * honda_flux = new GHondaAtmoFlux;
+     atmo_flux_driver = dynamic_cast<GAtmoFlux *>(honda_flux);
+  }else {
      LOG("gevgen_atmo", pFATAL) << "Uknonwn flux simulation: " << gOptFluxSim;
      gAbortingInErr = true;
      exit(1);
@@ -608,9 +613,9 @@ void GetCommandLineArgs(int argc, char ** argv)
     for(string::size_type i=0; i<gOptFluxSim.size(); i++) {
        gOptFluxSim[i] = toupper(gOptFluxSim[i]);
     }
-    if((gOptFluxSim != "FLUKA") && (gOptFluxSim != "BGLRS")) {
+    if((gOptFluxSim != "FLUKA") && (gOptFluxSim != "BGLRS") && (gOptFluxSim != "HONDA")) {
         LOG("gevgen_atmo", pFATAL) 
-             << "The flux file source needs to be one of <FLUKA,BGLRS>"; 
+             << "The flux file source needs to be one of <FLUKA,BGLRS,HONDA>"; 
         PrintSyntax();
         gAbortingInErr = true;
         exit(1);
