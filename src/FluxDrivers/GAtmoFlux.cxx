@@ -302,18 +302,6 @@ void GAtmoFlux::Initialize(void)
 {
   LOG("Flux", pNOTICE) << "Initializing atmospheric flux driver";
 
-  fMaxEv = -1; 
-
-  fNumPhiBins = 0;  
-  fNumCosThetaBins = 0; 
-  fNumEnergyBins = 0;
-  fPhiBins = 0;
-  fCosThetaBins = 0;
-  fEnergyBins = 0;
-
-  fTotalFluxHisto = 0;
-  fTotalFluxHistoIntg = 0;
-
   bool allow_dup = false;
   fPdgCList = new PDGCodeList(allow_dup);
 
