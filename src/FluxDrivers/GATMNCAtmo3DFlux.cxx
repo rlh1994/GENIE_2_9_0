@@ -129,7 +129,7 @@ void GATMNCAtmo3DFlux::SetBinSizes(void)
 
 }
 //____________________________________________________________________________
-bool GATMNCAtmo3DFlux::FillFluxHisto(TH3D * histo, string filename)
+bool GATMNCAtmo3DFlux::FillFluxHisto(TH3D * histo, string filename, const int& pdg_nu)
 {
   LOG("Flux", pNOTICE) << "Loading: " << filename;
 
