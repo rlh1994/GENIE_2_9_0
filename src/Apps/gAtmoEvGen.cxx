@@ -203,6 +203,9 @@
 
          Tarak Thakore <tarak \at mailhost.tifr.res.in>
          Tata Institute of Fundamental Research 
+         
+         Ryan Hill
+         Queen Mary, University of London
 
 \cpright Copyright (c) 2003-2015, GENIE Neutrino MC Generator Collaboration
          For the full text of the license visit http://copyright.genie-mc.org
